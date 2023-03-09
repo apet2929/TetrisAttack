@@ -1,0 +1,64 @@
+new_sprites.png
+size: 590, 259
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+heart_panel
+  rotate: false
+  xy: 322, 166
+  size: 15, 15
+  orig: 15, 15
+  offset: 0, 0
+  index: -1
+diamond_panel
+  rotate: false
+    xy: 338, 166
+    size: 15, 15
+    orig: 15, 15
+    offset: 0, 0
+    index: -1
+star_panel
+  rotate: false
+    xy: 354, 166
+    size: 15, 15
+    orig: 15, 15
+    offset: 0, 0
+    index: -1
+square_panel
+  rotate: false
+    xy: 370, 166
+    size: 15, 15
+    orig: 15, 15
+    offset: 0, 0
+    index: -1
+triangle_panel
+  rotate: false
+    xy: 386, 166
+    size: 15, 15
+    orig: 15, 15
+    offset: 0, 0
+    index: -1
+inverted_triangle_panel
+  rotate: false
+    xy: 402, 166
+    size: 15, 15
+    orig: 15, 15
+    offset: 0, 0
+    index: -1
+empty_panel
+  rotate: false
+    xy: 430, 181
+    size: 15, 15
+    orig: 15, 15
+    offset: 0, 0
+    index: -1
+p1_cursor
+    rotate: false
+    xy: 5, 171
+    size: 31, 31
+    orig: 31, 31
+    offset: 0, 0
+    index: -1
+
+
+
