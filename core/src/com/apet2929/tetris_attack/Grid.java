@@ -48,10 +48,10 @@ public class Grid {
                 Pos p0 = new Pos(j, i);
                 ArrayList<Pos> matchesX = getMatches(p0, new Pos(1,0), new ArrayList<Pos>());
                 ArrayList<Pos> matchesY = getMatches(p0, new Pos(0,1), new ArrayList<Pos>());
-                if(matchesX.size() >= 3) {
+                if(uniqueMatches(matches, matchesX) >= 3) {
                     matches.addAll(matchesX);
                 }
-                if(matchesY.size() >= 3){
+                if(uniqueMatches(matches, matchesY) >= 3) {
                     matches.addAll(matchesY);
                 }
             }
@@ -60,6 +60,17 @@ public class Grid {
             System.out.println("pos = " + pos);
             set(PanelType.NONE, pos.x, pos.y);
         }
+    }
+
+    private int uniqueMatches(HashSet<Pos> known, ArrayList<Pos> current) {
+        Pos p1 = new Pos(0,0);
+        Pos p2 = new Pos(0,0);
+        System.out.println("pos.equals(p2) = " + p1.equals(p2));
+        int i = 0;
+        for(Pos pos : current) {
+            if(!known.contains(pos)) i++;
+        }
+        return i;
     }
 
     private void fall(){
@@ -83,6 +94,7 @@ public class Grid {
 
     private ArrayList<Pos> getMatches(Pos p0, Pos dir, ArrayList<Pos> matches) {
         PanelType pt = get(p0);
+        if(pt == PanelType.NONE) return matches;
         matches.add(p0);
         Pos p1 = p0.add(dir);
         if(isInBounds(p1) && get(p1) == pt) getMatches(p1, dir, matches);

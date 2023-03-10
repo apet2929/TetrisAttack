@@ -19,7 +19,12 @@ public class Pos {
     @Override
     public boolean equals(Object obj) {
         Pos p = (Pos) obj;
-        return p.x == x && p.y == y;
+        return (p.x == x) && (p.y == y);
+    }
+
+    @Override
+    public int hashCode() {
+        return (y * Grid.GRID_WIDTH) + x;
     }
 
     @Override
