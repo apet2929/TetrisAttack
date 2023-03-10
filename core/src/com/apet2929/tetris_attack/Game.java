@@ -13,7 +13,6 @@ public class Game extends ApplicationAdapter {
 	public static final float SECONDS_BETWEEN_TICKS = 0.3f;
 
 	SpriteBatch batch;
-	Texture img;
 	TextureAtlas textures;
 	Grid grid;
 	Cursor cursor;
@@ -26,6 +25,7 @@ public class Game extends ApplicationAdapter {
 		grid = new Grid();
 		for (int i = 0; i < 6; i++){
 			grid.initRandomRow(i);
+			grid.set(PanelType.HEART, i, 0);
 		}
 		cursor = new Cursor();
 		tickTimer = SECONDS_BETWEEN_TICKS;
@@ -40,11 +40,11 @@ public class Game extends ApplicationAdapter {
 		if(Gdx.input.isKeyJustPressed(Input.Keys.UP)) cursor.translate(0, 1);
 		if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) cursor.translate(0, -1);
 		if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
-			grid.swap(cursor);
+//			grid.swap(cursor);
 			grid.tick();
 		} else {
 			if(tickTimer < 0) {
-				grid.tick();
+//				grid.tick();
 				tickTimer = SECONDS_BETWEEN_TICKS;
 			}
 		}

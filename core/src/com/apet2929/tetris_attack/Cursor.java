@@ -13,12 +13,9 @@ public class Cursor {
 
     public void translate(int dx, int dy) {
         if(isInBounds(x + dx, y + dy)){
-
             this.x += dx;
             this.y += dy;
-//            System.out.println("this = " + this);
         }
-        System.out.println("this = " + this.toString());
     }
 
     public int getX() {

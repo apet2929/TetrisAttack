@@ -22,7 +22,7 @@ public class Grid {
 
     public void tick(){
         removeMatches();
-        fall();
+//        fall();
     }
 
     public void reset(){
@@ -57,6 +57,7 @@ public class Grid {
             }
         }
         for (Pos pos : matches) {
+            System.out.println("pos = " + pos);
             set(PanelType.NONE, pos.x, pos.y);
         }
     }
@@ -66,7 +67,7 @@ public class Grid {
         for (int i = 0; i < grid.length; i++) {
             for (int j = 0; j < grid[i].length; j++) {
                 Pos p0 = new Pos(j, i);
-                if(isInBounds(p0.add(0,-1)) && get(p0.add(0,-1)) == PanelType.NONE || falling.contains(p0.add(0,-1))) {
+                if(isInBounds(p0.add(0,-1)) && get(p0.add(0,-1)) == PanelType.NONE || falling.contains(p0.add(0,1))) {
                     falling.add(p0);
                 }
             }
@@ -89,7 +90,7 @@ public class Grid {
     }
 
     private boolean isInBounds(Pos pos) {
-        return pos.x > 0 && pos.x < GRID_WIDTH && pos.y > 0 && pos.y < GRID_HEIGHT;
+        return pos.x >= 0 && pos.x < GRID_WIDTH && pos.y >= 0 && pos.y < GRID_HEIGHT;
     }
 
 
@@ -97,9 +98,7 @@ public class Grid {
         return grid[pos.y][pos.x];
     }
 
-
     public void set(PanelType pt, int x, int y) {
-        assert x > 0 && x < GRID_WIDTH && y > 0 && y < GRID_HEIGHT;
         grid[y][x] = pt;
     }
 
