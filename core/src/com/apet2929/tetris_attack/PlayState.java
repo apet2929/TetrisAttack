@@ -34,6 +34,7 @@ public class PlayState extends State {
 
     public void update() {
         float delta = Gdx.graphics.getDeltaTime();
+        cursor.update(delta);
         grid.tick(delta);
     }
 
