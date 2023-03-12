@@ -3,8 +3,6 @@ package com.apet2929.tetris_attack;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-
-import java.awt.*;
 import java.util.*;
 
 public class Grid {
@@ -15,29 +13,32 @@ public class Grid {
     public static final int GRID_HEIGHT = 20;
     public static final int GRID_WIDTH = 12;
 
-    private PanelType[][] grid;
-    private HashMap<Pos, Float> fallingPanels;
+    private Panel[][] grid;
     private float time;
 
     public Grid(){
-        grid = new PanelType[GRID_HEIGHT][GRID_WIDTH];
-        this.fallingPanels = new HashMap<>();
-
+        grid = new Panel[GRID_HEIGHT][GRID_WIDTH];
         reset();
     }
 
     public void tick(float deltaTime){
+        for (int i = 0; i <grid.length; i++) {
+            for (int j = 0; j <grid[i].length; j++) {
+                get(new Pos(j, i)).update(deltaTime);
+            }
+        }
+
         removeMatches();
+        checkCollisions();
         this.time += deltaTime;
-        searchFalling();
-        fall();
+//        searchFalling();
+//        fall();
     }
 
     public void reset(){
         for (int i = 0; i < GRID_HEIGHT; i++) {
             for (int j = 0; j < GRID_WIDTH; j++) {
-                grid[i][j] = PanelType.NONE;
-                fallingPanels.put(new Pos(j, i), -1f);
+                grid[i][j] = new Panel(PanelType.NONE, new Pos(j,i));
             }
         }
         time = 0;
@@ -47,22 +48,28 @@ public class Grid {
         Pos p1 = new Pos(cursor.getX(), cursor.getY());
         Pos p2 = new Pos(cursor.getX() + 1, cursor.getY());
         // resets falling timer for any panel that was falling that is swapped
-        fallingPanels.put(p1, -1f);
-        fallingPanels.put(p2, -1f);
+        get(p1).fallTimer = -1;
+        get(p2).fallTimer = -1;
 
         swap(cursor.getX(), cursor.getY(), cursor.getX()+1, cursor.getY());
     }
 
     private void swap(int x1, int y1, int x2, int y2) {
-        PanelType temp = grid[y1][x1];
-        set(grid[y2][x2], x1, y1);
-        set(temp, x2, y2);
+        Pos pos1 = new Pos(x1, y1);
+        Pos pos2 = new Pos(x2, y2);
+        Panel p1 = get(pos1);
+        Panel p2 = get(pos2);
+
+        p1.swap(pos2);
+        p2.swap(pos1);
+        set(p1, pos2);
+        set(p2, pos1);
     }
 
     private void removeMatches(){
         HashSet<Pos> matches = new HashSet<>();
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid[i].length; j++) {
+        for (int i = 0; i < GRID_HEIGHT; i++) {
+            for (int j = 0; j < GRID_WIDTH; j++) {
                 Pos p0 = new Pos(j, i);
                 ArrayList<Pos> matchesX = getMatches(p0, new Pos(1,0), new ArrayList<Pos>());
                 ArrayList<Pos> matchesY = getMatches(p0, new Pos(0,1), new ArrayList<Pos>());
@@ -80,7 +87,7 @@ public class Grid {
     }
 
     private boolean shouldFall(Pos pos) {
-        return this.time - fallingPanels.get(pos) > TIME_TO_FALL;
+        return get(pos).fallTimer > TIME_TO_FALL;
     }
 
     private int uniqueMatches(HashSet<Pos> known, ArrayList<Pos> current) {
@@ -92,12 +99,12 @@ public class Grid {
     }
 
     private void searchFalling(){
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid[i].length; j++) {
+        for (int i = 0; i < GRID_HEIGHT; i++) {
+            for (int j = 0; j < GRID_WIDTH; j++) {
                 Pos p0 = new Pos(j, i);
-                if(isInBounds(p0.add(0,-1)) && get(p0.add(0,-1)) == PanelType.NONE) {
+                if(isInBounds(p0.add(0,-1)) && get(p0.add(0,-1)).pt == PanelType.NONE) {
                     if(!isAlreadyFalling(p0)){
-                        this.fallingPanels.put(p0, this.time);
+                        get(p0).fallTimer = 0f;
                     }
                 }
             }
@@ -109,60 +116,27 @@ public class Grid {
             for (int x = 0; x < GRID_WIDTH; x++) {
                 Pos pos = new Pos(x, y);
                 if(shouldFall(pos)){
-                    PanelType pt = get(pos);
-                    while(isInBounds(pos.add(0,-1)) && get(pos.add(0,-1)) == PanelType.NONE) {
+                    PanelType pt = get(pos).pt;
+                    while(isInBounds(pos.add(0,-1)) && get(pos.add(0,-1)).pt == PanelType.NONE) {
                         pos = pos.add(0,-1);
                     }
                     swap(x, y, pos.x, pos.y); // maybe pos.y, maybe pos.y+1?
-                    fallingPanels.put(pos, -1f);
+                    get(pos).fallTimer = -1;
                 }
             }
         }
-
-//
-//        HashMap<Pos, PanelType> fp = new HashMap<>();
-//        ArrayList<Pos> columns = new ArrayList<>();
-//        for (Pos panel : fallingPanels.keySet()) {
-//            if(shouldFall(panel)) fp.put(panel, get(panel));
-//
-//            // group panels into columns of falling panels (all need to fall the same dist)
-//            boolean seen = false;
-//            for (Pos column : columns) {
-//                if(column.x == panel.x) {
-//                    seen = true;
-//                    if(panel.y < column.y) {
-//                        column.y = panel.y;
-//                    }
-//                    break;
-//                }
-//            }
-//            if(!seen) columns.add(panel);
-//        }
-//
-//        for (Map.Entry<Pos, PanelType> panel : fp.entrySet()) {
-//            Pos lowestFalling = panel.getKey();
-//            while(get(lowestFalling) != PanelType.NONE) {
-//                lowestFalling.add(0,-1);
-//            }
-//            int distToFall = 0;
-//            Pos floor = lowestFalling;
-//            while(get(floor) == PanelType.NONE) {
-//                distToFall++;
-//                floor = floor.add(0,-1);
-//            }
-//        }
     }
 
     private boolean isAlreadyFalling(Pos pos){
-        return fallingPanels.get(pos) != -1;
+        return get(pos).fallTimer != -1;
     }
 
     private ArrayList<Pos> getMatches(Pos p0, Pos dir, ArrayList<Pos> matches) {
-        PanelType pt = get(p0);
+        PanelType pt = get(p0).pt;
         if(pt == PanelType.NONE) return matches;
         matches.add(p0);
         Pos p1 = p0.add(dir);
-        if(isInBounds(p1) && get(p1) == pt) getMatches(p1, dir, matches);
+        if(isInBounds(p1) && get(p1).pt == pt) getMatches(p1, dir, matches);
         return matches;
     }
 
@@ -170,12 +144,24 @@ public class Grid {
         return pos.x >= 0 && pos.x < GRID_WIDTH && pos.y >= 0 && pos.y < GRID_HEIGHT;
     }
 
-    private PanelType get(Pos pos){
+    private Panel get(Pos pos){
+//        return gridNew.get(pos);
         return grid[pos.y][pos.x];
     }
+    private Panel get(int x, int y) {
+        return get(new Pos(x, y));
+    }
 
-    public void set(PanelType pt, int x, int y) {
-        grid[y][x] = pt;
+    public void set(Panel panel, int x, int y) {
+        grid[y][x] = panel;
+    }
+
+    public void set(Panel panel, Pos pos) {
+        grid[pos.y][pos.x] = panel;
+    }
+
+    public void set(PanelType pt, int x, int y){
+        set(new Panel(pt, new Pos(x,y)), x, y);
     }
 
     public void initRandomRow(int y) {
@@ -192,15 +178,43 @@ public class Grid {
     public void draw(SpriteBatch sb, TextureAtlas textures) {
         for (int i = 0; i < GRID_HEIGHT; i++) {
             for (int j = 0; j < GRID_WIDTH; j++) {
-                drawPanel(grid[i][j], j, i, sb, textures);
+                drawPanel(j, i, sb, textures);
             }
         }
     }
 
-    private void drawPanel(PanelType pt, int x, int y, SpriteBatch sb, TextureAtlas textures) {
-        int realX = (x * PANEL_SIZE) + START_X;
-        int realY = (y * PANEL_SIZE) + START_Y;
-        sb.draw(textures.findRegion(pt.asset), realX, realY, PANEL_SIZE, PANEL_SIZE);
+    private void drawPanel(int x, int y, SpriteBatch sb, TextureAtlas textures) {
+        try {
+            get(x, y).draw(sb, textures);
+        } catch (NullPointerException e) {
+            System.out.println("Error! at (" + x + ", " + y + ")");
+            int realX = Grid.getPanelPosX(x);
+            int realY = Grid.getPanelPosY(y);
+            sb.draw(textures.findRegion("error"), realX, realY, PANEL_SIZE, PANEL_SIZE);
+        }
+    }
+    private void checkCollisions(){
+        for (int i = 0; i < GRID_HEIGHT; i++) {
+            for (int j = 0; j < GRID_WIDTH; j++) {
+                Pos p = get(j, i).pos;
+                for (int k = 0; k < GRID_HEIGHT; k++) {
+                    for (int l = 0; l < GRID_WIDTH; l++) {
+                        if(l == j && k == i) continue;
+                        if(get(l, k).pos == p){
+                            System.out.println("Collision at " + p);
+                            System.out.println("x1,y1,x2,y2 = " + Arrays.toString(new int[]{j,i,l,k}));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public static int getPanelPosX(float x) {
+        return (int) ((x * PANEL_SIZE) + START_X);
+    }
+    public static int getPanelPosY(float y) {
+        return (int) ((y * PANEL_SIZE) + START_Y);
     }
 
 //    private class PanelGroup {

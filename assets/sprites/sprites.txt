@@ -55,8 +55,15 @@ empty_panel
 p1_cursor
     rotate: false
     xy: 5, 171
-    size: 31, 31
-    orig: 31, 31
+    size: 36, 36
+    orig: 36, 36
+    offset: 0, 0
+    index: -1
+error
+    rotate: false
+    xy: 402, 230
+    size: 15, 15
+    orig: 15, 15
     offset: 0, 0
     index: -1
 

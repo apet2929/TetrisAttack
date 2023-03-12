@@ -22,8 +22,30 @@ public class PlayState extends State {
             grid.set(PanelType.HEART, i, 0);
         }
         cursor = new Cursor();
+
+        test();
     }
 
+    private void test(){
+        Pos p1 = new Pos(0,0);
+        Pos p2 = new Pos(1,0);
+        Animation animation = new Animation(p1, p2, 1, () -> {
+            System.out.println("Yee");
+        });
+        animation.update(0.1f);
+        animation.update(0.1f);
+        animation.update(0.1f);
+        animation.update(0.1f);
+        animation.update(0.1f);
+        animation.update(0.1f);
+        animation.update(0.1f);
+        animation.update(0.1f);
+        animation.update(0.1f);
+        animation.update(0.1f);
+        animation.update(0.1f);
+        animation.update(0.1f);
+
+    }
     public void render() {
         ScreenUtils.clear(1, 1, 1, 1);
         batch.begin();
@@ -45,6 +67,8 @@ public class PlayState extends State {
         if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) cursor.translate(0, -1);
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
             grid.swap(cursor);
+            System.out.println("cursor.getX() = " + cursor.getX());
+            System.out.println("cursor.getY() = " + cursor.getY());
         }
     }
 }

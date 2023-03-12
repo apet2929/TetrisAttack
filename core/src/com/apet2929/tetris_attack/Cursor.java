@@ -4,34 +4,32 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
 public class Cursor {
-    private static final float LERP_CONST = 0.5f;
+    private static final float LERP_CONST = 0.1f;
 
-    private int x;
-    private int y;
-    private Pos posPixels;
+    private Pos pos;
+    private Animation animation;
     public Cursor(){
-        x = 0;
-        y = 0;
-        posPixels = new Pos(0,0);
+        pos = new Pos(0,0);
+        animation = new Animation(pos, pos, LERP_CONST);
     }
 
     public void translate(int dx, int dy) {
-        if(isInBounds(x + dx, y + dy)){
-            this.x += dx;
-            this.y += dy;
+        if(isInBounds(pos.x + dx, pos.y + dy)){
+            this.animation = new Animation(pos.clone(), pos.add(dx, dy), LERP_CONST);
+            this.pos = pos.add(dx, dy);
         }
     }
 
     public void update(float delta) {
-        this.posPixels = this.posPixels.lerp(new Pos(this.x, this.y), LERP_CONST);
+        animation.update(delta);
     }
 
     public int getX() {
-        return x;
+        return pos.x;
     }
 
     public int getY() {
-        return y;
+        return pos.y;
     }
 
     private boolean isInBounds(int x, int y){
@@ -39,11 +37,9 @@ public class Cursor {
     }
 
     public void draw(SpriteBatch sb, TextureAtlas textures) {
-        float rx = posPixels.getPixelsX();
-        float ry = posPixels.getPixelsY();
-        int realX = (int) ((rx * Grid.PANEL_SIZE) + Grid.START_X);
+        int realX = Grid.getPanelPosX(animation.getX());
         int realX2 = realX + Grid.PANEL_SIZE;
-        int realY = (int) ((ry * Grid.PANEL_SIZE) + Grid.START_Y);
+        int realY = Grid.getPanelPosY(animation.getY());
         sb.draw(textures.findRegion("p1_cursor"), realX, realY, Grid.PANEL_SIZE, Grid.PANEL_SIZE);
         sb.draw(textures.findRegion("p1_cursor"), realX2, realY, Grid.PANEL_SIZE, Grid.PANEL_SIZE);
     }
@@ -52,8 +48,8 @@ public class Cursor {
     @Override
     public String toString() {
         return "Cursor{" +
-                "x=" + x +
-                ", y=" + y +
+                "x=" + pos.x +
+                ", y=" + pos.y +
                 '}';
     }
 }
